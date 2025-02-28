@@ -2,42 +2,48 @@
 import numpy as np
 
 
-# Only takes in inputs
-def perceptron(args: list):
-	inputs = np.array(args)
-	# print(inputs.shape)
+class TrainingNeuron:
+	def __init__(self, num_inputs, learning_rate:float = 0.01):
+		self.weights = np.ones(num_inputs+1, dtype=float)
+		self.learning_rate = learning_rate
 
-	weights = np.ones((inputs.shape[0]+1,), dtype=float)
-	# print(weights.shape)
-	# print(weights)
-	y = (weights[1:] @ inputs) + weights[0]
-	return y
+	# Only takes in inputs
+	def perceptron(self, inputs: list):
+		inputs = np.array(inputs)
 
-def activation(y, name: str = "relu"):
-	if name == "relu":
-		if y > 0:
-			return y
-		else:
-			return 0
+		y = (self.weights[1:] @ inputs) + self.weights[0]
+		return y
 
-	elif name == "sigmoid":
-		return 1/(1 + (np.e** (-y)))
+	def activation(self, y, name: str = "relu"):
+		if name == "relu":
+			if y > 0:
+				return y
+			else:
+				return 0
 
-# Only enter activation name and inputs
-def predict(activation_name, *args, **kwargs):
-	remaining_inps = []
-	for i, j in kwargs.items():
-		remaining_inps.append(j)
+		elif name == "sigmoid":
+			return 1/(1 + (np.e** (-y)))
 
-	inputs = np.concatenate((args, remaining_inps))
+	# Only enter activation name and inputs
+	def forward(self, inputs, activation_name):
+		logit = self.perceptron(inputs)
+		prediction = self.activation(logit, activation_name)
+		return prediction
 
-	y = perceptron(inputs)
-	prediction = activation(y, activation_name)
-	return prediction
+	def loss(self, y, y_hat):
+		return y - y_hat
 
-def loss(y, y_hat):
-
+	def update_rule(self, loss_val, inputs):
+		self.weights[0] = self.weights[0] + (self.learning_rate * loss_val)
+		self.weights[1:] = self.weights[1:] + (self.learning_rate * loss_val * inputs)
 
 
 if __name__ == "__main__":
-	Y = predict("sigmoid", 1, 2, -1, -2)
+	num_inputs = int(input("Enter the number of inputs: integer: "))
+	str_inputs = input("Enter the inputs, delimited by a comma: ").split(',')
+
+	inputs = [int(i) for i in str_inputs]
+
+	training = TrainingNeuron(num_inputs, 1e-3)
+	y_hat = training.forward(inputs, "sigmoid")
+	print(y_hat)
