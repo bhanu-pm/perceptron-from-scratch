@@ -2,22 +2,15 @@
 import numpy as np
 
 
-def perceptron(*args: float, **kwargs: float):
-	inputs1 = np.array(args)
-	remaining_inps = []
-	for i, j in kwargs.items():
-		remaining_inps.append(j)
-
-	inputs2 = np.array(remaining_inps)
-	inputs = np.concatenate((inputs1, inputs2))
+# Only takes in inputs
+def perceptron(args: list):
+	inputs = np.array(args)
 	# print(inputs.shape)
 
-	weights = np.ones(inputs.shape, dtype=float)
+	weights = np.ones((inputs.shape[0]+1,), dtype=float)
 	# print(weights.shape)
 	# print(weights)
-	weights_0 = 0
-	y = (weights @ inputs) + weights_0
-
+	y = (weights[1:] @ inputs) + weights[0]
 	return y
 
 def activation(y, name: str = "relu"):
@@ -30,12 +23,21 @@ def activation(y, name: str = "relu"):
 	elif name == "sigmoid":
 		return 1/(1 + (np.e** (-y)))
 
+# Only enter activation name and inputs
+def predict(activation_name, *args, **kwargs):
+	remaining_inps = []
+	for i, j in kwargs.items():
+		remaining_inps.append(j)
+
+	inputs = np.concatenate((args, remaining_inps))
+
+	y = perceptron(inputs)
+	prediction = activation(y, activation_name)
+	return prediction
+
+def loss(y, y_hat):
+
+
 
 if __name__ == "__main__":
-	result = perceptron(1, 1, x3=-1, x4=-1)
-	activated = activation(result, "relu")
-	activated2 = activation(result, "sigmoid")
-
-	print(f"y: {result}")
-	print(activated)
-	print(activated2)
+	Y = predict("sigmoid", 1, 2, -1, -2)
