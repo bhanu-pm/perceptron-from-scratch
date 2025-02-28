@@ -20,6 +20,22 @@ def perceptron(*args: float, **kwargs: float):
 
 	return y
 
-perceptron(1, 2, x3=3, x4=4)
+def activation(y, name: str = "relu"):
+	if name == "relu":
+		if y > 0:
+			return y
+		else:
+			return 0
+
+	elif name == "sigmoid":
+		return 1/(1 + (np.e** (-y)))
 
 
+if __name__ == "__main__":
+	result = perceptron(1, 1, x3=-1, x4=-1)
+	activated = activation(result, "relu")
+	activated2 = activation(result, "sigmoid")
+
+	print(f"y: {result}")
+	print(activated)
+	print(activated2)
