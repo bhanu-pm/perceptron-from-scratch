@@ -44,37 +44,46 @@ class TrainingNeuron:
 		return loss_val
 
 
+def train_loop(train_dataset, num_inputs, activation_name, epochs):
+	avg_loss = 0.0
+	
+	training = TrainingNeuron(num_inputs, 1e-5)
+	for epoch in range(epochs):
+		counter = 0
+		for i in train_ds:
+			counter += 1
+			# split into X and Y
+			x, y = i[:-1], i[-1]
+
+			# forward pass
+			y_hat = training.forward(x, activation_name)
+
+			# calculate loss
+			# backward pass to update weights
+			loss_val = training.backward(x, y, y_hat)
+			avg_loss += loss_val
+
+			if counter % 10 == 0:
+				print(f"Average loss per 10 training examples: {avg_loss/10}")
+				avg_loss = 0.0
+
+		# print(f"Average loss per epoch {avg_loss_epoch/100}")
+
+	print(f"These are the weights: {training.weights}")
+
 if __name__ == "__main__":
-	# num_inputs = int(input("Enter the number of inputs: integer: "))
-	# str_inputs = input("Enter the inputs, delimited by a comma: ").split(',')
-
-	# inputs = [int(i) for i in str_inputs]
-
 	### TRAINING LOOP
 	ds = pd.read_csv("ds.csv")
 	# print(ds.head(10))
 	dataset = ds.to_numpy()
-
-	training = TrainingNeuron(num_inputs, 1e-2)
-	# y_hat = training.forward(inputs, "relu")
-	# print(y_hat)
-
 
 	# Train test split
 	train_ds = dataset[:80, :]
 	test_ds = dataset[80:, :]
 
 	num_inputs = 3
-	activation = "relu"
-	epochs = 10
-	for epoch in epochs:
-		for i in train_ds:
-			# split into X and Y
-			x, y = i[:-1], i[-1]
+	activation_name = "relu"
+	epochs = 200
 
-			# forward pass
-			y_hat = training.forward(x, activation)
+	train_loop(train_ds, num_inputs, activation_name, epochs)
 
-			# calculate loss
-			# backward pass to update weights
-			loss_val = training.backward(x, y, y_hat)
